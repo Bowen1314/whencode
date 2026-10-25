@@ -71,7 +71,7 @@ main { padding-top: 20px; padding-bottom: 32px; outline: none; }
 .field.narrow { max-width: 360px; }
 label, legend { display: block; font-weight: 600; margin-bottom: 4px; }
 .small-label { font-size: .9rem; margin-top: 10px; }
-.opt { font-weight: 400; color: var(--muted); font-size: .9rem; }
+.optional { font-weight: 400; color: var(--muted); font-size: .9rem; }
 input, select, textarea { font: inherit; color: inherit; width: 100%; padding: 9px 10px; border: 1px solid #b9bccd; border-radius: 8px; background: #fff; min-height: 42px; }
 textarea { resize: vertical; }
 input[readonly], textarea[readonly] { background: #f8f8fc; }
