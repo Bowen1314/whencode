@@ -75,7 +75,7 @@ Differences: **no server or account at all**; **calendar import from a local .ic
 
 ## Evidence of need
 
-- In a study of opt-in study groups in a 1,000+ student CS course at UC Berkeley (477 consenting students), "students struggled to schedule group meetings, and **48.5%** of students reported this as a challenge they faced". This was despite the matching system prioritising availability. Source: Kohli et al., SIGCSE 2023, [arXiv:2202.07439](https://arxiv.org/abs/2202.07439), section 3.4.
+- In a study of opt-in study groups in a 1,000+ student introductory engineering and computer science course at UC Berkeley, run online during COVID (477 students consented to the research), **48.5%** of students named scheduling group meetings as a challenge they faced. This was despite the matching system prioritising availability. Source: Kohli et al., SIGCSE 2023, [arXiv:2202.07439](https://arxiv.org/abs/2202.07439), section 3.4.
 - The existence and popularity of the tools above shows the need. The privacy gap is that the convenient options (calendar sync, "find a time") require an account connection or an organisation-wide calendar.
 
 **No user testing has been done yet.** Nothing here claims that students prefer WhenCode.
