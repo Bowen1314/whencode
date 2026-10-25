@@ -1,0 +1,21 @@
+{
+  "name": "whencode",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Find a meeting time for a group project with no accounts, no server and no calendar upload.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "test": "node --test \"tests/unit/*.test.mjs\"",
+    "e2e": "playwright test",
+    "serve": "node scripts/serve.mjs",
+    "vendor": "node scripts/vendor.mjs",
+    "measure": "node scripts/measure-codes.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "axe-core": "^4.14.0",
+    "ical.js": "^2.2.1",
+    "qrcode-generator": "^2.0.4"
+  }
+}

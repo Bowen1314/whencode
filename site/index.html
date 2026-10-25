@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' blob:; font-src 'self'; manifest-src 'self'; worker-src 'self'; connect-src 'none'; form-action 'none'; base-uri 'none'">
+  <meta name="referrer" content="no-referrer">
+  <meta name="description" content="Find a meeting time for a group project. No accounts, no server, and your calendar never leaves your device.">
+  <title>WhenCode: find a group meeting time</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="css/app.css">
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="top">
+    <div class="wrap top-inner">
+      <a class="brand" href="./" aria-label="WhenCode home">
+        <svg class="logo" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="2" y="2" width="28" height="28" rx="7" class="logo-bg"/><g class="logo-cells"><rect x="7" y="8" width="5" height="5" rx="1"/><rect x="13.5" y="8" width="5" height="5" rx="1" class="on"/><rect x="20" y="8" width="5" height="5" rx="1"/><rect x="7" y="14.5" width="5" height="5" rx="1" class="on"/><rect x="13.5" y="14.5" width="5" height="5" rx="1" class="on"/><rect x="20" y="14.5" width="5" height="5" rx="1" class="on"/><rect x="7" y="21" width="5" height="5" rx="1"/><rect x="13.5" y="21" width="5" height="5" rx="1" class="on"/><rect x="20" y="21" width="5" height="5" rx="1"/></g></svg>
+        <span>WhenCode</span>
+      </a>
+      <nav aria-label="Main">
+        <a href="#about" data-scroll="about">How it works</a>
+        <a href="#privacy" data-scroll="privacy">Privacy</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="wrap" tabindex="-1">
+    <noscript><p class="notice error">WhenCode runs entirely in your browser and needs JavaScript.</p></noscript>
+    <div id="boot-error" class="notice error" hidden></div>
+
+    <!-- ===================== SETUP (organiser) ===================== -->
+    <section id="view-setup" class="view" hidden aria-labelledby="setup-h">
+      <div class="hero">
+        <h1 id="setup-h">Find a meeting time for your group project.</h1>
+        <p class="lede">No accounts and no server. Your calendar never leaves your device. Everything travels as links in the group chat you already have.</p>
+        <ol class="steps" aria-label="How WhenCode works">
+          <li><strong>1. Organiser</strong> picks the dates and hours and posts the starter link.</li>
+          <li><strong>2. Everyone</strong> paints the times they're free, or imports a calendar file, and posts back a short code.</li>
+          <li><strong>3. Organiser</strong> pastes the codes and gets a heatmap, the best slots and an invite file.</li>
+        </ol>
+        <p><button type="button" class="btn ghost" id="demo-btn">See a finished example with 5 members</button></p>
+      </div>
+
+      <form id="setup-form" class="card" novalidate>
+        <h2>Create a starter link</h2>
+        <div class="field">
+          <label for="f-title">Meeting name <span class="opt">(optional, visible to anyone with the link)</span></label>
+          <input id="f-title" name="title" maxlength="60" placeholder="e.g. CS 214 group project" autocomplete="off">
+        </div>
+        <div class="row2">
+          <div class="field"><label for="f-start">First day</label><input id="f-start" type="date" required></div>
+          <div class="field"><label for="f-end">Last day</label><input id="f-end" type="date" required></div>
+        </div>
+        <fieldset class="field">
+          <legend>Days of the week</legend>
+          <div class="chips" id="f-weekdays"></div>
+        </fieldset>
+        <div class="row3">
+          <div class="field"><label for="f-from">Daily from</label><select id="f-from"></select></div>
+          <div class="field"><label for="f-to">Daily until</label><select id="f-to"></select></div>
+          <div class="field"><label for="f-slot">Slot length</label>
+            <select id="f-slot"><option value="15">15 min</option><option value="20">20 min</option><option value="30" selected>30 min</option><option value="60">1 hour</option></select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="f-tz">Time zone for these hours</label>
+          <select id="f-tz"></select>
+          <p class="hint">Members in other time zones automatically see the grid in their own local time.</p>
+        </div>
+        <p id="setup-summary" class="summary" aria-live="polite"></p>
+        <div id="setup-errors" class="notice error" role="alert" hidden></div>
+        <button class="btn primary" type="submit">Create starter link</button>
+      </form>
+
+      <div id="setup-result" class="card result" hidden tabindex="-1" aria-labelledby="result-h">
+        <h2 id="result-h">Your starter link is ready</h2>
+        <p>Post this in your group chat. Everyone opens it, adds their availability and replies with their code.</p>
+        <label for="starter-link" class="small-label">Starter link</label>
+        <div class="copyrow">
+          <input id="starter-link" readonly>
+          <button type="button" class="btn" data-copy="starter-link">Copy link</button>
+        </div>
+        <label for="starter-msg" class="small-label">Message to paste in the chat</label>
+        <div class="copyrow">
+          <textarea id="starter-msg" rows="3" readonly></textarea>
+          <button type="button" class="btn" data-copy="starter-msg">Copy message</button>
+        </div>
+        <div class="actions">
+          <a class="btn primary" id="starter-fill">Add my own availability</a>
+          <a class="btn" id="starter-merge">Open the merge page</a>
+          <button type="button" class="btn ghost" data-qr="starter-link">Show QR code</button>
+        </div>
+        <div class="qr" data-qr-box="starter-link" hidden></div>
+      </div>
+    </section>
+
+    <!-- ===================== FILL (member) ===================== -->
+    <section id="view-fill" class="view" hidden aria-labelledby="fill-h">
+      <div class="planbar card" data-planbar></div>
+
+      <div class="card">
+        <h1 id="fill-h">Add your availability</h1>
+        <div class="field narrow">
+          <label for="m-name">Your name, as the group knows you</label>
+          <input id="m-name" maxlength="24" autocomplete="nickname" placeholder="e.g. Ana">
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>When are you free?</h2>
+        <div class="tabs" role="tablist" aria-label="How to enter your availability">
+          <button type="button" role="tab" id="tab-paint" aria-controls="panel-paint" aria-selected="true">Paint the grid</button>
+          <button type="button" role="tab" id="tab-import" aria-controls="panel-import" aria-selected="false" tabindex="-1">Import a calendar file</button>
+        </div>
+        <div id="panel-paint" role="tabpanel" aria-labelledby="tab-paint">
+          <p class="hint">Click or drag across times to mark them <strong>free</strong>. Keyboard: arrow keys move, <kbd>Space</kbd> toggles, <kbd>Shift</kbd>+arrow paints. On a phone, tap or drag on the grid; swipe on the time labels to scroll.</p>
+        </div>
+        <div id="panel-import" role="tabpanel" aria-labelledby="tab-import" hidden>
+          <p>Choose an <strong>.ics</strong> file exported from your calendar. It is read <strong>on this device only</strong>. Nothing is uploaded, and event titles never go into your code.</p>
+          <details class="howto"><summary>How do I export my calendar?</summary>
+            <ul>
+              <li><strong>Google Calendar</strong> (computer): Settings → Import &amp; export → Export. Unzip and pick the calendar's .ics file.</li>
+              <li><strong>Outlook</strong>: Calendar → Share/Publish, or File → Save Calendar (desktop) as iCalendar.</li>
+              <li><strong>Apple Calendar</strong> (Mac): select the calendar, then File → Export → Export….</li>
+              <li><strong>Canvas or a class timetable</strong>: many offer an "iCal feed" or .ics download.</li>
+            </ul>
+          </details>
+          <div class="field">
+            <label for="ics-file">Calendar file (.ics)</label>
+            <input id="ics-file" type="file" accept=".ics,text/calendar">
+          </div>
+          <label class="check"><input type="checkbox" id="ics-allday"> Count all-day events (holidays, birthdays) as busy</label>
+          <p class="small">No calendar handy? <button type="button" class="linkish" id="ics-sample">Use a sample student calendar</button> or <a id="ics-sample-dl" download="sample-student-calendar.ics">download it</a> to try the file picker.</p>
+          <div id="ics-report" class="notice" hidden aria-live="polite"></div>
+        </div>
+
+        <div class="gridtools">
+          <div class="legend" aria-hidden="true">
+            <span><i class="sw sw-free">✓</i> Free</span>
+            <span><i class="sw sw-busy"></i> Not free</span>
+            <span><i class="sw sw-cal"></i> Busy in your calendar</span>
+          </div>
+          <div class="btns">
+            <button type="button" class="btn small" id="all-free">Mark all free</button>
+            <button type="button" class="btn small" id="all-busy">Clear all</button>
+          </div>
+        </div>
+        <div id="fill-grid" class="gridhost"></div>
+      </div>
+
+      <div class="card" aria-labelledby="code-h">
+        <h2 id="code-h">Your code</h2>
+        <p>Paste this code, or the reply link, into the group chat. The code updates as you change the grid.</p>
+        <label for="my-code" class="small-label">Code</label>
+        <div class="copyrow">
+          <textarea id="my-code" rows="2" readonly class="mono"></textarea>
+          <button type="button" class="btn primary" data-copy="my-code">Copy code</button>
+        </div>
+        <label for="my-link" class="small-label">Reply link (includes the planning window, so anyone can open it)</label>
+        <div class="copyrow">
+          <input id="my-link" readonly>
+          <button type="button" class="btn" data-copy="my-link">Copy link</button>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn" id="share-btn" hidden>Share…</button>
+          <button type="button" class="btn ghost" data-qr="my-link">Show QR code</button>
+          <a class="btn ghost" id="fill-to-merge">Go to the merge page</a>
+        </div>
+        <div class="qr" data-qr-box="my-link" hidden></div>
+        <details class="inside" id="inside" open>
+          <summary>What's inside this code?</summary>
+          <div id="inside-body"></div>
+        </details>
+        <p class="small">Your name and grid are also kept in this browser's local storage so you can come back and edit. <button type="button" class="linkish" id="forget-me">Forget my data on this device</button></p>
+      </div>
+    </section>
+
+    <!-- ===================== MERGE (organiser) ===================== -->
+    <section id="view-merge" class="view" hidden aria-labelledby="merge-h">
+      <div class="planbar card" data-planbar></div>
+      <div class="card">
+        <h1 id="merge-h">Merge everyone's codes</h1>
+        <label for="paste">Paste codes or reply links. One or many; pasting the whole chat is fine.</label>
+        <textarea id="paste" rows="3" class="mono" placeholder="WC1.…"></textarea>
+        <div class="actions">
+          <button type="button" class="btn primary" id="add-codes">Add codes</button>
+          <a class="btn ghost" id="merge-to-fill">Add my own availability</a>
+        </div>
+        <div id="paste-report" class="notice" hidden role="status"></div>
+      </div>
+
+      <div class="cols">
+        <div class="card" aria-labelledby="members-h">
+          <h2 id="members-h">Members <span class="count" id="member-count"></span></h2>
+          <p class="hint" id="members-empty">No codes yet. Ask the group to reply with theirs.</p>
+          <ul id="members" class="members"></ul>
+          <div class="actions">
+            <button type="button" class="btn small ghost" id="clear-members" hidden>Remove all</button>
+          </div>
+        </div>
+        <div class="card" aria-labelledby="best-h">
+          <h2 id="best-h">Best times</h2>
+          <div class="row2 compact">
+            <div class="field"><label for="len">Meeting length</label><select id="len"></select></div>
+            <div class="field"><label for="ltitle">Invite title</label><input id="ltitle" maxlength="60"></div>
+          </div>
+          <p class="hint">Tick <strong>Required</strong> next to a member to hide times they can't make.</p>
+          <ol id="options" class="options" aria-live="polite"></ol>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Heatmap</h2>
+        <div class="gridtools">
+          <div class="legend" aria-hidden="true" id="heat-legend"></div>
+        </div>
+        <div id="heat-grid" class="gridhost"></div>
+        <div id="cell-detail" class="detail" aria-live="polite"></div>
+      </div>
+
+      <div class="card">
+        <h2>Share the merged view</h2>
+        <p>This link contains every code above, so others can see the same heatmap.</p>
+        <div class="copyrow">
+          <input id="merge-link" readonly aria-label="Merged view link">
+          <button type="button" class="btn" data-copy="merge-link">Copy link</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="about" class="card info" aria-labelledby="about-h">
+      <h2 id="about-h">How it works</h2>
+      <ul>
+        <li>The starter link holds the planning window in readable form after the <code>#</code>: dates, weekdays, daily hours, slot length and time zone. Browsers do not send the part after <code>#</code> to any server.</li>
+        <li>Each member's code holds only a <strong>display name</strong>, one bit per time slot (free or not), a 2-byte window check and a 2-byte checksum. A typo or a code cut off by a chat app is detected, not silently merged.</li>
+        <li>Calendar files are parsed in your browser with <a href="https://github.com/kewisch/ical.js">ical.js</a>, including repeating events (RRULE, EXDATE and moved occurrences). You review the result before sharing.</li>
+        <li>Every slot is a fixed moment in time. Members in other time zones see the same slots labelled in their local time, including across daylight-saving changes.</li>
+      </ul>
+    </section>
+    <section id="privacy" class="card info" aria-labelledby="privacy-h">
+      <h2 id="privacy-h">Privacy, and what it costs</h2>
+      <ul>
+        <li>This page is static files only. A Content Security Policy (<code>connect-src 'none'</code>) stops the page from making any network request with your data, and the project's tests check this.</li>
+        <li>After the first visit it also works offline.</li>
+        <li><strong>Trade-offs:</strong> someone has to collect the codes by hand; nothing updates live; and anyone who has a code can read that person's free/busy pattern for the window. Share codes only in the group's own chat.</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="wrap foot">
+    <p>WhenCode is open source (MIT). It uses <a href="https://github.com/kewisch/ical.js">ical.js</a> (MPL-2.0) and <a href="https://github.com/kazuhikoarase/qrcode-generator">qrcode-generator</a> (MIT). <a href="https://github.com/Bowen1314/whencode">Source and credits</a>.</p>
+  </footer>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

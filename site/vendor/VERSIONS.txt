@@ -1,0 +1,6 @@
+ical.js 2.2.1 (MPL-2.0)
+qrcode-generator 2.0.4 (MIT)
+
+SHA-256 (identical to the npm package files):
+6643f20634241dc040e02c2f10e3c48cf9bcda4b3180f4321a3d05a3a83dfe52  ical.min.js
+ea91d7118a5395289170da848b7c6758b996163bfbccf312591ab65a4911b7c0  qrcode.mjs
