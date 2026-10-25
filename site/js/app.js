@@ -605,6 +605,7 @@ function renderMerge() {
     cb.addEventListener('change', () => {
       if (cb.checked) m.required.add(x.name); else m.required.delete(x.name);
       renderOptions();
+      renderHeatLegend();
       state.grids.heat.refresh();
     });
     req.append(cb, el('span', {}, 'Required'));
@@ -634,6 +635,11 @@ function renderHeatLegend() {
   for (const [lv, t] of [[0, 'nobody'], [2, 'some'], [4, 'most'], [5, 'everyone']]) {
     const s = el('span');
     s.append(el('i', { class: `sw h${lv}${lv === 5 ? ' all' : ''}` }, lv === 5 ? `${n}/${n}` : ''), document.createTextNode(` ${t}`));
+    lg.append(s);
+  }
+  if (state.merge.required.size) {
+    const s = el('span');
+    s.append(el('i', { class: 'sw h2 reqx' }), document.createTextNode(' striped: a required member can\'t'));
     lg.append(s);
   }
 }
