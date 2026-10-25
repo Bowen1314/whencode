@@ -84,7 +84,10 @@ export function allTimeZones() {
   } catch {
     list = ['UTC'];
   }
-  if (!list.includes('UTC')) list = ['UTC', ...list];
+  // Some ICU builds (e.g. Chromium) list only legacy names; add the current ones the browser accepts.
+  const modern = ['Asia/Kolkata', 'Europe/Kyiv', 'Asia/Ho_Chi_Minh', 'Asia/Kathmandu', 'Asia/Yangon', 'America/Nuuk', 'Pacific/Kanton'];
+  const extra = modern.filter((z) => !list.includes(z) && isValidTimeZone(z));
+  list = [...new Set(['UTC', ...list, ...extra])].sort((a, b) => (a === 'UTC' ? -1 : b === 'UTC' ? 1 : a.localeCompare(b)));
   return list;
 }
 
